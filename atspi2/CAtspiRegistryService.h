@@ -94,7 +94,7 @@ private:
          */
         DBusConnectionRegistrationIDsMap registration_ids;
 
-        /** The assocaited event callback function */
+        /** The associated event callback function */
         EventListener listener;
     } EventListenerInfo;
 
@@ -588,7 +588,7 @@ private:
      * @param [in] detail      Event specific description. E.g. "focused"
      * @param [in] data1       Event specific extra information. E.g "1" or "0" in case of a
      *                         "Object:StateChange" event with the "focused" detail will indicate
-     *                         wether the oject is focused or not, respectivly
+     *                         whether the oject is focused or not, respectivly
      * @param [in] data2       Event specific extra information.
      */
     void onSignal(GDBusConnection *connection,

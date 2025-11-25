@@ -32,7 +32,7 @@ public:
     /**
      * Constructor
      */
-    CTTSClientStub() {}
+    CTTSClientStub() : m_initialized(false) {}
 
     /**
      * Destructor

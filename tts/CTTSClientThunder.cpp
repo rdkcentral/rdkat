@@ -47,7 +47,7 @@ void CTTSClientThunder::speak(const std::string &text)
 
     if (!m_initialized)
     {
-        RDKLOG_WARNING("TTS Client not iniitalized, so unable to speak");
+        RDKLOG_WARNING("TTS Client not initialized, so unable to speak");
         return;
     }
 

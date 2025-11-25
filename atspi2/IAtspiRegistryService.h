@@ -58,7 +58,7 @@ public:
      * @param [in] detail Event specific description. E.g. "focused"
      * @param [in] data1  Event specific extra information. E.g "1" or "0" in case of a
      *                    "Object:StateChange" event with the "focused" detail will indicate
-     *                    whether the oject is focused or not, respectivly
+     *                    whether the object is focused or not, respectively
      * @param [in] data2  Event specific extra information.
      * @param [in] object An accessible object instance associated with the event.
      *

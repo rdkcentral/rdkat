@@ -412,7 +412,7 @@ bool CAtspiAccessibleObject::atspiMethodCallToClient(const std::string &object_p
 
     output.clear();
     output.reserve(count);
-    for (gsize i = 0; (array != nullptr), i < count; i++)
+    for (gsize i = 0; (array != nullptr) && i < count; i++)
     {
         output.emplace_back(array[i]);
     }

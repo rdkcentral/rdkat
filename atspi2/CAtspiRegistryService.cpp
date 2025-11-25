@@ -26,8 +26,6 @@
 #include "CDBusClientRegistry.h"
 #include "CContextSignalEmitter.h"
 
-// #define DBG_ATSPI_BUS 1 // Enable logging of D-Bus messages seen by the server
-
 static const gchar g_dbus_introspection_xml[] =
     "<node>"
     "  <interface name=\"org.freedesktop.DBus\">"
@@ -77,38 +75,6 @@ static const gchar g_registry_introspection_xml[] =
     "    </signal>"
     "  </interface>"
     "</node>";
-
-#ifdef DBG_ATSPI_BUS
-static GDBusMessage *dbg_dbus_message_filter(GDBusConnection *connection,
-                                             GDBusMessage *message,
-                                             gboolean incoming,
-                                             gpointer user_data)
-{
-    GVariant *body = g_dbus_message_get_body(message);
-    gchar *body_content = body ? g_variant_print(body, FALSE) : NULL;
-
-    const char *types[] = {"invalid", "method_call", "method_return", "error", "signal"};
-
-    g_print("D-Bus message - %s%s %s %d(%d) sender: %s destination: %s %s %s.%s\n     %s\n",
-            "client id ",
-            incoming ? "->" : "<-",
-            types[g_dbus_message_get_message_type(message)],
-            g_dbus_message_get_serial(message),
-            g_dbus_message_get_reply_serial(message),
-            g_dbus_message_get_sender(message),
-            g_dbus_message_get_destination(message),
-            g_dbus_message_get_path(message),
-            g_dbus_message_get_interface(message),
-            g_dbus_message_get_member(message),
-            body_content ? body_content : "(no body)");
-
-    if (body_content)
-    {
-        g_free(body_content);
-    }
-    return message;
-}
-#endif
 
 CAtspiRegistryService::CAtspiRegistryService(const std::string &address)
     : m_address(address)
@@ -260,10 +226,6 @@ gboolean CAtspiRegistryService::onNewConnection(GDBusConnection *connection)
     g_signal_connect(connection, "closed", G_CALLBACK(onClosedConnectionWrapper), this);
 
     CDBusClientRegistry::add(connection);
-
-#ifdef DBG_ATSPI_BUS
-    g_dbus_connection_add_filter(connection, dbg_dbus_message_filter, NULL, NULL);
-#endif
 
     registerDBusInterfaces(connection);
     registerRegistryInterfaces(connection);

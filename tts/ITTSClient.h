@@ -57,14 +57,14 @@ public:
      * @returns Indication if initialization completed successfully
      *
      * @retval true  Successfully initialized implementation
-     * @retval false An error occured and initialization did not complete
+     * @retval false An error occurred and initialization did not complete
      *
      * @see ITTSClient::uninitialize
      */
     virtual bool initialize() = 0;
 
     /**
-     * Unitializes the TTS client implementation, afer which no text to speech transformation
+     * Uninitializes the TTS client implementation, after which no text to speech transformation
      * is possible or TTS state changes notified
      *
      * @see ITTSClient::initialize

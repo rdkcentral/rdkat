@@ -54,7 +54,7 @@ public:
     virtual void initialize() = 0;
 
     /**
-     * Unitializes the screen reader to stop processing accessibility related events
+     * Uninitializes the screen reader to stop processing accessibility related events
      *
      * @see IScreenReader::initialize
      */

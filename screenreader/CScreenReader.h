@@ -103,7 +103,7 @@ private:
      * @param [in] event  The name of the event ("Object:StateChanged")
      * @param [in] detail Event specific description. E.g. "focused"
      * @param [in] data1  Event specific extra information. E.g "1" or "0" in case of a
-     *                    "focused" detail which indicates whether the oject is focused or not
+     *                    "focused" detail which indicates whether the object is focused or not
      * @param [in] data2  Not relevant for this event
      * @param [in] object An accessible object instance associated with the event to allow query of
      *                    additional data
