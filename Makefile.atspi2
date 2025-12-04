@@ -64,3 +64,44 @@ install:
 
 clean:
 	@rm -rf obj/* librdkatatspi2.so*
+
+
+TEST_CFLAGS := $(shell pkg-config --cflags glib-2.0 gio-2.0 gtest gmock)
+TEST_LIBS   := $(shell pkg-config --libs glib-2.0 gio-2.0 gtest gmock) -lgtest_main
+TEST_INC    := $(shell pkg-config --cflags-only-I glib-2.0 gio-2.0 gtest gmock)
+
+TEST_CXXFLAGS += -Wno-attributes -Wall -g -fpermissive $(SEARCH) -std=c++17 -fPIC $(TEST_CFLAGS)
+TEST_LDFLAGS = $(TEST_LIBS) -L./
+
+test_SRCS=test_CScreenReader.cpp test_CAtspiRegistryService.cpp test_CDBusClientRegistry.cpp
+test_OBJS=$(patsubst %.cpp, $(OBJDIR)/%.test.o, $(notdir $(test_SRCS)))
+test_OBJS:=$(patsubst %.c, $(OBJDIR)/%.test.o, $(test_OBJS))
+test_OBJS: $(test_SRCS)
+test_OBJS_ALL=$(test_OBJS)
+
+TEST_SEARCH=\
+  -I. \
+  -I./atspi2 \
+  -I./tts \
+  -I./screenreader \
+  $(TEST_INC) \
+  -I./tests \
+  -I./tests/stubs \
+  -I./tests/mocks
+
+
+$(OBJDIR)/%.test.o : SEARCH:=$(TEST_SEARCH)
+$(OBJDIR)/%.test.o : ./tests/%.cpp
+	@[ -d $(OBJDIR) ] || mkdir -p $(OBJDIR)
+	$(CXX) -c $(CXXFLAGS) $(TEST_CXXFLAGS) $< -o $@
+
+run-tests: SEARCH:=$(TEST_SEARCH)
+run-tests: EXTRA_LDFLAGS = $(TEST_LDFLAGS)
+run-tests: librdkatatspi2.so $(test_OBJS_ALL) Makefile.atspi2
+	$(CXX) $(test_OBJS_ALL) ./librdkatatspi2.so $(LDFLAGS) $(EXTRA_LDFLAGS) -o $@
+
+test: run-tests
+	./run-tests
+
+clean-test: clean
+	@rm -rf ./run-tests

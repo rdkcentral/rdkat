@@ -17,6 +17,7 @@
  * limitations under the License.
  */
 
+#include <stdio.h>
 #include <glib.h>
 
 #include "rdkat-atspi2.h"

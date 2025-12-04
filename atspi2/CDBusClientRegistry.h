@@ -22,6 +22,7 @@
 #include <unordered_map>
 #include <memory>
 #include <string>
+#include <functional>
 
 #include <gio/gio.h>
 
@@ -181,6 +182,14 @@ public:
      */
     static void execute(std::function<void(const CDBusClient &client)> handler);
 
+    /**
+     * Removes all tracked clients, invoking a provided handler function for each registered
+     * client before removing it
+     *
+     * @param [in] handler A callback function invoked for each tracked client
+     */
+    static void clear(std::function<void(const CDBusClient &client)> handler);
+
 public:
     /**
      * Map of all tracked clients
@@ -189,5 +198,5 @@ public:
      *       only connections who's object still exists, so no colision is possible in case a
      *       new connection has the same pointer as a previously closed one
      */
-    static std::unordered_map<GDBusConnection *, CDBusClient *> clients;
+    static std::unordered_map<GDBusConnection *, std::unique_ptr<CDBusClient>> clients;
 };

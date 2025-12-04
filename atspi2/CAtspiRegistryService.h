@@ -557,11 +557,12 @@ private:
     /**
      * Handle an existing connection being closed
      *
-     * @param [in] connection The D-Bus connection instance being closed
+     * @param [in] connection      The D-Bus connection instance being closed
+     * @param [in] update_registry Updates the client registry accordingly
      *
      * @note Called from the D-Bus context
      */
-    void onClosedConnection(GDBusConnection *connection);
+    void onClosedConnection(GDBusConnection *connection, bool update_registry = true);
 
     /**
      * Callback to process method calls send over D-Bus by a client
@@ -597,6 +598,16 @@ private:
                   const std::string detail,
                   uint32_t data1,
                   uint32_t data2);
+
+    /**
+     * Indicates whether the service has been started and is active or not
+     *
+     * @return Boolean indicating whether the service is active
+     *
+     * @retval true  Service is active (was started)
+     * @retval false Service is not active (was stopped or not started at all)
+     */
+    bool active() const;
 
 private:
     /** The D-Bus server instance */

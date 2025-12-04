@@ -117,7 +117,7 @@ void CScreenReader::handleEventObjectStateChanged(const std::string &event, cons
         auto cell_description = object.cellDescription();
         if (!cell_description.empty())
         {
-            speech_data = cell_description + speech_data;
+            speech_data = cell_description + " " + speech_data;
         }
 
         speak = true;
@@ -319,10 +319,14 @@ void CScreenReader::uninitializeFromWorkerThread()
 
     if (!m_initialized)
     {
+        // Let invoker thread know we are done
+        signalSyncTaskDone();
         return;
     }
 
     m_atspi_service->stop();
+
+    ttsDisabledFromWorkerThread();
 
     m_tts_client->unregisterListener();
     m_tts_client->uninitialize();
@@ -330,6 +334,9 @@ void CScreenReader::uninitializeFromWorkerThread()
     m_initialized = false;
 
     g_main_loop_quit(m_worker_loop);
+
+    // Let invoker thread know we are done
+    signalSyncTaskDone();
 }
 
 void CScreenReader::initialize()
@@ -393,6 +400,8 @@ void CScreenReader::uninitialize()
         RDKLOG_WARNING("Screen reader was not initialized before.");
         return;
     }
+    initSyncTask();
+
     g_main_context_invoke(m_worker_context, [](gpointer user_data) -> gboolean
                           {
                               CScreenReader *screen_reader = static_cast<CScreenReader *>(user_data);
@@ -402,6 +411,13 @@ void CScreenReader::uninitialize()
                               return FALSE; // Single shot
                           },
                           this);
+
+
+    // Wait initialization task to complete
+    waitSyncTaskDone();
+
+    // Clean up what's not needed anymore
+    uninitSyncTask();
 
     // Wait till the shutdown has completed
     g_thread_join(m_worker_thread);
