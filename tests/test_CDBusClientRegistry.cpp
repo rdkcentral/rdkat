@@ -22,7 +22,7 @@ protected:
     {
         for (std::size_t i = 0; i < MAX_CONNECTIONS; i++)
         {
-            // Hard cast GObject to DBus connection for test purpose only, as altough CDBusClientRegistry
+            // Hard cast GObject to DBus connection for test purpose only, as although CDBusClientRegistry
             // interface receives a GDBusConnection, it cares for it only as an GObject. This avoids
             // added complexity of mocking GDBusConnection
             m_connections.push_back(static_cast<GDBusConnection *>(g_object_new(G_TYPE_OBJECT, NULL)));

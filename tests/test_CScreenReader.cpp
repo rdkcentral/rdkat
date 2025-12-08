@@ -46,7 +46,7 @@ protected:
 TEST_F(CScreenReaderInitializationTest, init_uninit_with_tts_enabled)
 {
     // We test the initialize and uninitialize calls in the same test, because in order to test
-    // the uninitialize sequence, we'd' need to perform a proper initialize sequence first,
+    // the uninitialize sequence, we'd need to perform a proper initialize sequence first,
     // which would mean repeating same code in 2 different (but related) tests.
     // To have a cleaner separation, we verify midway that the initialize sequence succeeded
 
@@ -108,7 +108,7 @@ TEST_F(CScreenReaderInitializationTest, init_uninit_with_tts_enabled)
 TEST_F(CScreenReaderInitializationTest, init_uninit_with_tts_disabled)
 {
     // We test the initialize and uninitialize calls in the same test, because in order to test
-    // the uninitialize sequence, we'd' need to perform a proper initialize sequence first,
+    // the uninitialize sequence, we'd need to perform a proper initialize sequence first,
     // which would mean repeating same code in 2 different (but related) tests.
     // To have a cleaner separation, we verify midway that the initialize sequence succeeded
 

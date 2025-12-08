@@ -413,7 +413,7 @@ void CScreenReader::uninitialize()
                           this);
 
 
-    // Wait initialization task to complete
+    // Wait uninitialization task to complete
     waitSyncTaskDone();
 
     // Clean up what's not needed anymore
