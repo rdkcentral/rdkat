@@ -1,4 +1,8 @@
 #!/bin/sh
+
+# Exit on error
+set -e
+
 PARENT_DIR=$(dirname $(dirname $(realpath $0)))
 
 if [ "$1" = "clean" ]; then

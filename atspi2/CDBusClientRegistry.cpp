@@ -25,7 +25,7 @@
 #include "CDBusClientRegistry.h"
 
 std::unordered_map<GDBusConnection *, std::unique_ptr<CDBusClient>> CDBusClientRegistry::clients;
-const std::string CDBusClient::SERVER_ID = ":1.0"; // Must not colide with id generated in CDBusClient()
+const std::string CDBusClient::SERVER_ID = ":1.0"; // Must not collide with id generated in CDBusClient()
 
 CDBusClient::CDBusClient(GDBusConnection *connection)
 {

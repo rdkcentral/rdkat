@@ -30,7 +30,7 @@ SEARCH=\
   -I$(SYSROOT_INCLUDES_DIR)/glib-2.0 \
   -I$(SYSROOT_LIBS_DIR)/glib-2.0/include
 
-EXTRA_CXXFLAGS += -Wno-attributes -Wall -g -fpermissive $(SEARCH) -std=c++17 -fPIC
+EXTRA_CXXFLAGS += -Wno-attributes -Wall -g $(SEARCH) -std=c++17 -fPIC
 EXTRA_LDFLAGS = -lglib-2.0 -lTTSClient -Wl,-rpath=../../,-rpath=./ -Wl,-soname,librdkatatspi2.so.0
 
 ifdef ENABLE_RDK_LOGGER
@@ -96,7 +96,7 @@ TEST_SEARCH=$(SEARCH)\
 
 endif
 
-TEST_CXXFLAGS += -Wno-attributes -Wall -g -fpermissive $(SEARCH) -std=c++17 -fPIC $(TEST_CFLAGS)
+TEST_CXXFLAGS += -Wno-attributes -Wall -g $(SEARCH) -std=c++17 -fPIC $(TEST_CFLAGS)
 TEST_LDFLAGS = $(TEST_LIBS) -L./
 
 test_SRCS=test_CScreenReader.cpp test_CAtspiRegistryService.cpp test_CDBusClientRegistry.cpp
