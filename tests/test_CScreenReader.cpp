@@ -1,6 +1,8 @@
 #include <gio/gio.h>
 #include <glib.h>
 #include <chrono>
+#include <mutex>
+#include <condition_variable>
 
 #include "gtest/gtest.h"
 
@@ -291,10 +293,10 @@ TEST_F(CScreenReaderRegistryServiceListenersTest, tts_state_change)
 {
     EXPECT_CALL(m_registry_service, registerEventListener("Document:LoadComplete",_))
         .Times(1)
-        .WillOnce([&]{notifySingleCall();});
+        .WillOnce([&](auto&&...){notifySingleCall();});
     EXPECT_CALL(m_registry_service, registerEventListener("Object:StateChanged",_))
         .Times(1)
-        .WillOnce([&]{notifySingleCall();});
+        .WillOnce([&](auto&&...){notifySingleCall();});
 
     setExpectedCallCount(2);
 
@@ -310,10 +312,10 @@ TEST_F(CScreenReaderRegistryServiceListenersTest, tts_state_change)
 
     EXPECT_CALL(m_registry_service, unregisterEventListener("Document:LoadComplete"))
         .Times(1)
-        .WillOnce([&]{notifySingleCall();});
+        .WillOnce([&](auto&&...){notifySingleCall();});
     EXPECT_CALL(m_registry_service, unregisterEventListener("Object:StateChanged"))
         .Times(1)
-        .WillOnce([&]{notifySingleCall();});
+        .WillOnce([&](auto&&...){notifySingleCall();});
 
     setExpectedCallCount(2);
 
@@ -435,7 +437,7 @@ TEST_P(CScreenReaderRegistryServiceEventsTest, send_events)
     {
         EXPECT_CALL(m_tts_client, speak(param.expected_speech))
             .Times(1)
-            .WillOnce([&]{notifySingleCall();});
+            .WillOnce([&](auto&&...){notifySingleCall();});
         
         setExpectedCallCount(1);
     }
