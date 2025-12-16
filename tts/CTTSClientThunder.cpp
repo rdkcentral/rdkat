@@ -58,11 +58,6 @@ void CTTSClientThunder::speak(const std::string &text)
     {
         TTS::SpeechData data;
 
-        // TODO if(!RDKAt::Instance().m_mediaVolumeUpdated && RDKAt::Instance().m_mediaVolumeControlCB) {
-        //     RDKAt::Instance().m_mediaVolumeControlCB(RDKAt::Instance().m_mediaVolumeControlCBData, 0.25);
-        //     RDKAt::Instance().m_mediaVolumeUpdated = true;
-        // }
-
         RDKLOG_VERBOSE("Speaking text: '%s'", text.c_str());
 
         data.text = text;
@@ -166,8 +161,6 @@ void CTTSClientThunder::destroySession()
     {
         return;
     }
-    // TODO if(m_mediaVolumeControlCBData)
-    // TODO    m_mediaVolumeControlCB(m_mediaVolumeControlCBData, 1);
     m_tts_client->abort(m_session_id);
     m_tts_client->destroySession(m_session_id);
 
@@ -223,22 +216,16 @@ void CTTSClientThunder::onSpeechStart(uint32_t appid, uint32_t sessionid, TTS::S
 void CTTSClientThunder::onSpeechComplete(uint32_t appid, uint32_t sessionid, TTS::SpeechData &data)
 {
     RDKLOG_VERBOSE("Speech complete: appid=%d, sessionid=%d, speechid=%d, text=%s", appid, sessionid, data.id, data.text.c_str());
-
-    // TODO    resetMediaVolume();
 }
 
 void CTTSClientThunder::onPlaybackError(uint32_t appId, uint32_t sessionId, uint32_t speechId)
 {
     RDKLOG_WARNING("Playback error: appid=%d, sessionid=%d, speechid=%d", appId, sessionId, speechId);
-
-    // TODO    resetMediaVolume();
 }
 
 void CTTSClientThunder::onNetworkError(uint32_t appId, uint32_t sessionId, uint32_t speechId)
 {
     RDKLOG_WARNING("Network error: appid=%d, sessionid=%d, speechid=%d", appId, sessionId, speechId);
-
-    // TODO    resetMediaVolume();
 }
 
 uint32_t CTTSClientThunder::generateAppId()

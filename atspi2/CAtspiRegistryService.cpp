@@ -142,6 +142,13 @@ void CAtspiRegistryService::stop()
         RDKLOG_WARNING("D-Bus server is not running");
         return;
     }
+
+    // Service may have been stopped while there are still active connections. Cleanup
+    CDBusClientRegistry::clear([this](const CDBusClient &client)
+                               {
+                                   onClosedConnection(client.connection(), false);
+                               });
+
     g_dbus_server_stop(m_dbus_server);
 
     g_object_unref(m_dbus_server);
@@ -152,6 +159,11 @@ void CAtspiRegistryService::stop()
     m_dbus_context = nullptr;
 
     RDKLOG_INFO("AT-SPI2 registry service stopped");
+}
+
+bool CAtspiRegistryService::active() const
+{
+    return (m_dbus_server != nullptr);
 }
 
 std::string CAtspiRegistryService::address()
@@ -235,16 +247,25 @@ gboolean CAtspiRegistryService::onNewConnection(GDBusConnection *connection)
     return TRUE;
 }
 
-void CAtspiRegistryService::onClosedConnection(GDBusConnection *connection)
+void CAtspiRegistryService::onClosedConnection(GDBusConnection *connection, bool update_registry)
 {
     RDKLOG_INFO("Client disconnected");
+
+    if (!active())
+    {
+        RDKLOG_TRACE("Client disconnected ignored as service is not active anymore");
+        return;
+    }
 
     unsubscribeSignalsActive(connection);
 
     unregisterRegistryInterfaces(connection);
     unregisterDBusInterfaces(connection);
 
-    CDBusClientRegistry::remove(connection);
+    if (update_registry)
+    {
+        CDBusClientRegistry::remove(connection);
+    }
 }
 
 CAtspiRegistryService::RegistrationID CAtspiRegistryService::registerInterface(GDBusConnection *connection,

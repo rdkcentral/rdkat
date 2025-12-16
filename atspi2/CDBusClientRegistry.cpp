@@ -20,11 +20,12 @@
 #include <algorithm>
 #include <sstream>
 #include <unordered_map>
+#include <memory>
 
 #include "CDBusClientRegistry.h"
 
-std::unordered_map<GDBusConnection *, CDBusClient *> CDBusClientRegistry::clients;
-const std::string CDBusClient::SERVER_ID = ":1.0"; // Must not colide with id generated in CDBusClient()
+std::unordered_map<GDBusConnection *, std::unique_ptr<CDBusClient>> CDBusClientRegistry::clients;
+const std::string CDBusClient::SERVER_ID = ":1.0"; // Must not collide with id generated in CDBusClient()
 
 CDBusClient::CDBusClient(GDBusConnection *connection)
 {
@@ -71,7 +72,7 @@ CDBusClient *CDBusClientRegistry::getByConnection(GDBusConnection *connection)
 {
     auto it = clients.find(connection);
 
-    return (it != clients.end()) ? it->second : nullptr;
+    return (it != clients.end()) ? it->second.get() : nullptr;
 }
 
 CDBusClient *CDBusClientRegistry::getById(const std::string &id)
@@ -79,7 +80,7 @@ CDBusClient *CDBusClientRegistry::getById(const std::string &id)
     auto it = std::find_if(clients.begin(), clients.end(), [id](const auto &entry)
                            { return entry.second->id() == id; });
 
-    return (it != clients.end()) ? it->second : nullptr;
+    return (it != clients.end()) ? it->second.get() : nullptr;
 }
 
 CDBusClient *CDBusClientRegistry::getByName(const std::string &name)
@@ -87,7 +88,7 @@ CDBusClient *CDBusClientRegistry::getByName(const std::string &name)
     auto it = std::find_if(clients.begin(), clients.end(), [name](const auto &entry)
                            { return entry.second->name() == name; });
 
-    return (it != clients.end()) ? it->second : nullptr;
+    return (it != clients.end()) ? it->second.get() : nullptr;
 }
 
 void CDBusClientRegistry::execute(std::function<void(const CDBusClient &client)> handler)
@@ -95,5 +96,14 @@ void CDBusClientRegistry::execute(std::function<void(const CDBusClient &client)>
     for (auto const &entry : clients)
     {
         std::invoke(handler, *(entry.second));
+    }
+}
+
+void CDBusClientRegistry::clear(std::function<void(const CDBusClient &client)> handler)
+{
+    for (auto it = clients.begin(); it != clients.end(); )
+    {
+        std::invoke(handler, *(it->second));
+        it = clients.erase(it);
     }
 }

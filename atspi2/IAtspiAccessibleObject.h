@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -36,16 +37,22 @@ class IAtspiAccessibleObject
 public:
     /** A role indicating an error condition, such as uninitialized Role data */
     static inline constexpr uint32_t ATSPI_ROLE_INVALID = 0;
+    /** A choice that can be checked or unchecked */
+    static inline constexpr uint32_t ATSPI_ROLE_CHECK_BOX = 7;
     /** An object the user can manipulate to tell the application to do something */
-    static inline constexpr uint32_t ATSPI_ROLE_BUTTON = 43;
+    static inline constexpr uint32_t ATSPI_ROLE_PUSH_BUTTON = 43;
     /** An object used to represent information in terms of rows and columns */
     static inline constexpr uint32_t ATSPI_ROLE_TABLE = 55;
     /** A ‘cell’ or discrete child within a Table */
     static inline constexpr uint32_t ATSPI_ROLE_TABLE_CELL = 56;
     /** A row within a Table */
     static inline constexpr uint32_t ATSPI_ROLE_TABLE_ROW = 90;
+    /** An object with descriptive information about another element (e.g. table) */
+    static inline constexpr uint32_t ATSPI_ROLE_CAPTION = 81;
     /** The object is a visual frame or container which contains a view of document content */
     static inline constexpr uint32_t ATSPI_ROLE_DOCUMENT_FRAME = 82;
+    /** The object is a document frame containing HTML or other markup */
+    static inline constexpr uint32_t ATSPI_ROLE_DOCUMENT_WEB = 95;
 
     /** Indicates an invalid state - probably an error condition */
     static inline constexpr uint32_t ATSPI_STATE_INVALID = 0;

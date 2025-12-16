@@ -30,7 +30,7 @@ SEARCH=\
   -I$(SYSROOT_INCLUDES_DIR)/glib-2.0 \
   -I$(SYSROOT_LIBS_DIR)/glib-2.0/include
 
-EXTRA_CXXFLAGS += -Wno-attributes -Wall -g -fpermissive $(SEARCH) -std=c++17 -fPIC
+EXTRA_CXXFLAGS += -Wno-attributes -Wall -g $(SEARCH) -std=c++17 -fPIC
 EXTRA_LDFLAGS = -lglib-2.0 -lTTSClient -Wl,-rpath=../../,-rpath=./ -Wl,-soname,librdkatatspi2.so.0
 
 ifdef ENABLE_RDK_LOGGER
@@ -64,3 +64,66 @@ install:
 
 clean:
 	@rm -rf obj/* librdkatatspi2.so*
+
+
+ifeq ($(SYSROOT_INCLUDES_DIR),)
+# Building standalone (not integrated in build system)
+
+TEST_CFLAGS := $(shell pkg-config --cflags glib-2.0 gio-2.0 gobject-2.0 gtest gmock)
+TEST_LIBS   := $(shell pkg-config --libs glib-2.0 gio-2.0 gobject-2.0 gtest gmock) -lgtest_main
+TEST_INC    := $(shell pkg-config --cflags-only-I glib-2.0 gio-2.0 gobject-2.0 gtest gmock)
+
+TEST_SEARCH=\
+  -I. \
+  -I./atspi2 \
+  -I./tts \
+  -I./screenreader \
+  $(TEST_INC) \
+  -I./tests \
+  -I./tests/stubs \
+  -I./tests/mocks
+
+else
+# Building using build system
+
+TEST_CFLAGS := 
+TEST_LIBS   := -lglib-2.0 -lgio-2.0 -lgobject-2.0 -lgtest -lgmock -lgtest_main
+
+TEST_SEARCH=$(SEARCH)\
+  -I./tests \
+  -I./tests/stubs \
+  -I./tests/mocks
+
+endif
+
+TEST_CXXFLAGS += -Wno-attributes -Wall -g $(SEARCH) -std=c++17 -fPIC $(TEST_CFLAGS)
+TEST_LDFLAGS = $(TEST_LIBS) -L./
+
+test_SRCS=test_CScreenReader.cpp test_CAtspiRegistryService.cpp test_CDBusClientRegistry.cpp
+test_OBJS=$(patsubst %.cpp, $(OBJDIR)/%.test.o, $(notdir $(test_SRCS)))
+test_OBJS:=$(patsubst %.c, $(OBJDIR)/%.test.o, $(test_OBJS))
+test_OBJS: $(test_SRCS)
+test_OBJS_ALL=$(test_OBJS)
+
+
+$(OBJDIR)/%.test.o : SEARCH:=$(TEST_SEARCH)
+$(OBJDIR)/%.test.o : ./tests/%.cpp
+	@[ -d $(OBJDIR) ] || mkdir -p $(OBJDIR)
+	$(CXX) -c $(CXXFLAGS) $(TEST_CXXFLAGS) $< -o $@
+
+.PHONY: tests
+
+tests: SEARCH:=$(TEST_SEARCH)
+tests: EXTRA_LDFLAGS = $(TEST_LDFLAGS)
+tests: librdkatatspi2.so $(test_OBJS_ALL) Makefile.atspi2
+	$(CXX) $(test_OBJS_ALL) ./librdkatatspi2.so $(LDFLAGS) $(EXTRA_LDFLAGS) -o run-tests
+
+run-tests: tests
+	./run-tests
+
+clean-tests: clean
+	@rm -rf ./run-tests
+
+install-tests: tests
+	@mkdir -p ${INSTALL_PATH}/usr/bin/
+	@cp -f run-tests ${INSTALL_PATH}/usr/bin/

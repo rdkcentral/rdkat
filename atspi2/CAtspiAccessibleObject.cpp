@@ -193,7 +193,9 @@ std::string CAtspiAccessibleObject::getCellDescription()
             RDKLOG_WARNING("Failed to get caption for object");
             return "";
         }
-        if (!caption_object_path.empty() && ((cell_object_path == saved_cell_object_path) || (table_object_path != saved_table_object_path)))
+        if (!caption_object_path.empty() &&
+            (caption_object_path != "/org/a11y/atspi/null") &&
+            ((cell_object_path == saved_cell_object_path) || (table_object_path != saved_table_object_path)))
         {
             dbusPropertyCallToClient(caption_object_path, "Name", caption);
         }
@@ -216,11 +218,11 @@ std::string CAtspiAccessibleObject::getCellDescription()
 
     if (!caption.empty())
     {
-        description = caption + ". ";
+        description = caption + ".";
     }
     if (!row_header.empty())
     {
-        description += row_header + ". ";
+        description += row_header + ".";
     }
 
     return description;
