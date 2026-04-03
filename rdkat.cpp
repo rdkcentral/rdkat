@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
+#include <algorithm>
 #include <unistd.h>
 #include <atk/atk.h>
 
@@ -39,6 +40,8 @@
 
 #define PROPERTY_CHANGE "PropertyChange"
 #define STATE_CHANGED   "state-changed"
+
+#define APP_EXCLUSIONS { "redirect", "skyjspp" }   // add app names here which doesn't need to be supported for TTS
 
 using namespace std;
 
@@ -353,6 +356,11 @@ void RDKAt::createOrDestroySession()
     m_shouldCreateSession = false;
 }
 
+inline std::string toLower(std::string s) {
+    std::transform(s.begin(), s.end(), s.begin(), ::tolower);
+    return s;
+}
+
 void RDKAt::HandleEvent(AtkObject *obj, std::string klass,
         const gchar* major_raw, const gchar* minor_raw,
         guint32 d1, guint32 d2, const void *val, int type)
@@ -370,6 +378,18 @@ void RDKAt::HandleEvent(AtkObject *obj, std::string klass,
     const std::string minor = minor_raw ? minor_raw : "";
 
     printEventInfo(klass, major, minor, d1, d2, val, type);
+
+    RDKLOG_INFO("kykumar rdkat inside rdkat.cpp\n");
+    std::vector<std::string> apps = APP_EXCLUSIONS;
+    std::string name, desc, role;
+    getAccessibilityInfo(obj, name, desc, role);
+    RDKLOG_INFO("kykumar rdkat returning name = \"%s\", desc = \"%s\", role = \"%s\"\n", name.c_str(), desc.c_str(), role.c_str());
+    for (const auto& appTitle : apps) {
+        if (toLower(appTitle) == toLower(name)) {
+            RDKLOG_INFO("%s doesn't need TTS support, skipping processing for app", name.c_str());
+            return;
+        }
+    }
 
     RDKAt::Instance().ensureTTSConnection();
     RDKAt::Instance().createOrDestroySession();
@@ -389,7 +409,6 @@ void RDKAt::HandleEvent(AtkObject *obj, std::string klass,
 
     TTS::SpeechData d;
     bool speak = false;
-    std::string name, desc, role;
     static unsigned int counter = 0;
     if(major == "state-changed") {
         if(minor == "focused" && d1 == 1) {
