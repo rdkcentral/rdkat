@@ -392,10 +392,6 @@ void RDKAt::HandleEvent(AtkObject *obj, std::string klass,
             logDebuggingDisabled = false;
             return;
         }
-        if(logDebuggingDisabled)
-            RDKLOG_ERROR("TTS is disabled, not fetching accessibility info");
-        logDebuggingDisabled = false;
-        return;
     }
     logDebuggingDisabled = true;
 
