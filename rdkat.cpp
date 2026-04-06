@@ -27,7 +27,6 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
-#include <algorithm>
 #include <unistd.h>
 #include <atk/atk.h>
 
@@ -40,8 +39,6 @@
 
 #define PROPERTY_CHANGE "PropertyChange"
 #define STATE_CHANGED   "state-changed"
-
-#define APP_EXCLUSIONS { "redirect", "skyjspp" }   // add app names here which doesn't need to be supported for TTS
 
 using namespace std;
 
@@ -356,11 +353,6 @@ void RDKAt::createOrDestroySession()
     m_shouldCreateSession = false;
 }
 
-inline std::string toLower(std::string s) {
-    std::transform(s.begin(), s.end(), s.begin(), ::tolower);
-    return s;
-}
-
 void RDKAt::HandleEvent(AtkObject *obj, std::string klass,
         const gchar* major_raw, const gchar* minor_raw,
         guint32 d1, guint32 d2, const void *val, int type)
@@ -379,33 +371,24 @@ void RDKAt::HandleEvent(AtkObject *obj, std::string klass,
 
     printEventInfo(klass, major, minor, d1, d2, val, type);
 
-    std::vector<std::string> apps = APP_EXCLUSIONS;
-    const char* namePtr = atk_object_get_name(obj);
-    if(!namePtr){
-        RDKLOG_ERROR("App title is empty, skipping processing for app");
+    static bool logDebuggingDisabled = true;
+    static bool enableDebugging = getenv("ENABLE_RDKAT_DEBUGGING");
+    if(!enableDebugging){
+        if(logDebuggingDisabled)
+            RDKLOG_ERROR("RDK-AT Debugging is disabled, not fetching accessibility info");
+        logDebuggingDisabled = false;
         return;
     }
-    std::string appName(namePtr);
-    for (const auto& appTitle : apps) {
-        if (toLower(appTitle) == toLower(appName)) {
-            RDKLOG_ERROR("%s doesn't need TTS support, skipping processing for app", appName.c_str());
-            return;
-        }
-    }
-    
+
     RDKAt::Instance().ensureTTSConnection();
     RDKAt::Instance().createOrDestroySession();
 
     // If TTS is not enabled, skip costly dom traversals as part of name & desc retrieval
-    static bool enableDebugging = getenv("ENABLE_RDKAT_DEBUGGING");
-    static bool logDebuggingDisabled = true;
     if(!RDKAt::Instance().m_ttsEnabled) {
-        if(!enableDebugging) {
-            if(logDebuggingDisabled)
-                RDKLOG_ERROR("Both TTS & RDK-AT Debugging are disabled, not fetching accessibility info");
-            logDebuggingDisabled = false;
-            return;
-        }
+        if(logDebuggingDisabled)
+            RDKLOG_ERROR("TTS is disabled, not fetching accessibility info");
+        logDebuggingDisabled = false;
+        return;
     }
     logDebuggingDisabled = true;
 
