@@ -381,17 +381,10 @@ void RDKAt::HandleEvent(AtkObject *obj, std::string klass,
 
     RDKLOG_INFO("kykumar rdkat inside rdkat.cpp\n");
     std::vector<std::string> apps = APP_EXCLUSIONS;
-    std::string name, desc, role;
-    getAccessibilityInfo(obj, name, desc, role);
-    RDKLOG_INFO("kykumar rdkat returning name = \"%s\", desc = \"%s\", role = \"%s\"\n", name.c_str(), desc.c_str(), role.c_str());
-    for (const auto& appTitle : apps) {
-        if (toLower(appTitle) == toLower(name)) {
-            RDKLOG_INFO("%s doesn't need TTS support, skipping processing for app", name.c_str());
-            return;
-        }
-    }
 
+    printf("kykumar enusrettsconection\n");
     RDKAt::Instance().ensureTTSConnection();
+    printf("kykumar createordestroytts\n");
     RDKAt::Instance().createOrDestroySession();
 
     // If TTS is not enabled, skip costly dom traversals as part of name & desc retrieval
@@ -409,6 +402,7 @@ void RDKAt::HandleEvent(AtkObject *obj, std::string klass,
 
     TTS::SpeechData d;
     bool speak = false;
+    std::string name, desc, role;
     static unsigned int counter = 0;
     if(major == "state-changed") {
         if(minor == "focused" && d1 == 1) {
@@ -445,6 +439,14 @@ void RDKAt::HandleEvent(AtkObject *obj, std::string klass,
             speak = true;
         }
     } else if(major == "load-complete") {
+        std::string appName = checkNullAndReturnStr(atk_object_get_name(obj));
+        RDKLOG_INFO("kykumar rdkat returning name = %s\n", appName.c_str());
+        for (const auto& appTitle : apps) {
+            if (toLower(appTitle) == toLower(appName)) {
+                RDKLOG_INFO("%s doesn't need TTS support, skipping processing for app", appName.c_str());
+                return;
+            }
+        }
         AtkRole atkrole = atk_object_get_role(obj);
         if(atkrole == ATK_ROLE_DOCUMENT_FRAME)
               return;
