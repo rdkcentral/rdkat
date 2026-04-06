@@ -379,20 +379,20 @@ void RDKAt::HandleEvent(AtkObject *obj, std::string klass,
 
     printEventInfo(klass, major, minor, d1, d2, val, type);
 
-    RDKLOG_INFO("kykumar rdkat inside rdkat.cpp\n");
     std::vector<std::string> apps = APP_EXCLUSIONS;
-
-    std::string appName = atk_object_get_name(obj);
-    if(appName.empty()){
+    const char* namePtr = atk_object_get_name(obj);
+    if(!namePtr){
         RDKLOG_ERROR("App title is empty, skipping processing for app");
         return;
     }
+    std::string appName(namePtr);
     for (const auto& appTitle : apps) {
         if (toLower(appTitle) == toLower(appName)) {
             RDKLOG_ERROR("%s doesn't need TTS support, skipping processing for app", appName.c_str());
             return;
         }
     }
+    
     RDKAt::Instance().ensureTTSConnection();
     RDKAt::Instance().createOrDestroySession();
 
