@@ -372,11 +372,11 @@ void RDKAt::HandleEvent(AtkObject *obj, std::string klass,
     printEventInfo(klass, major, minor, d1, d2, val, type);
 
     static bool logDebuggingDisabled = true;
-    static bool disableRdkat = getenv("DISABLE_RDKAT");
-    if(disableRdkat){
+    if(getenv("DISABLE_RDKAT")){
         if(logDebuggingDisabled)
             RDKLOG_ERROR("RDK-AT is disabled, not fetching accessibility info");
         logDebuggingDisabled = false;
+        // skip costly dom traversals
         return;
     }
 
