@@ -372,10 +372,10 @@ void RDKAt::HandleEvent(AtkObject *obj, std::string klass,
     printEventInfo(klass, major, minor, d1, d2, val, type);
 
     static bool logDebuggingDisabled = true;
-    static bool enableDebugging = getenv("ENABLE_RDKAT_DEBUGGING");
-    if(!enableDebugging){
+    static bool disableRdkat = getenv("DISABLE_RDKAT");
+    if(disableRdkat){
         if(logDebuggingDisabled)
-            RDKLOG_ERROR("RDK-AT Debugging is disabled, not fetching accessibility info");
+            RDKLOG_ERROR("RDK-AT is disabled, not fetching accessibility info");
         logDebuggingDisabled = false;
         return;
     }
@@ -384,7 +384,14 @@ void RDKAt::HandleEvent(AtkObject *obj, std::string klass,
     RDKAt::Instance().createOrDestroySession();
 
     // If TTS is not enabled, skip costly dom traversals as part of name & desc retrieval
+    static bool enableDebugging = getenv("ENABLE_RDKAT_DEBUGGING");
     if(!RDKAt::Instance().m_ttsEnabled) {
+        if(!enableDebugging) {
+            if(logDebuggingDisabled)
+                RDKLOG_ERROR("Both TTS & RDK-AT Debugging are disabled, not fetching accessibility info");
+            logDebuggingDisabled = false;
+            return;
+        }
         if(logDebuggingDisabled)
             RDKLOG_ERROR("TTS is disabled, not fetching accessibility info");
         logDebuggingDisabled = false;
