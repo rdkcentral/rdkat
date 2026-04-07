@@ -327,7 +327,7 @@ void RDKAt::ensureTTSConnection()
             return;
 
         m_connectionAttempt++;
-        RDKLOG_ERROR("intializing TTS client");
+        RDKLOG_ERROR("initializing TTS client");
         m_ttsClient = TTS::TTSClient::create(this);
     }
 }
