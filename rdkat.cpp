@@ -327,6 +327,7 @@ void RDKAt::ensureTTSConnection()
             return;
 
         m_connectionAttempt++;
+        RDKLOG_ERROR("initializing TTS client");
         m_ttsClient = TTS::TTSClient::create(this);
     }
 }
@@ -371,12 +372,20 @@ void RDKAt::HandleEvent(AtkObject *obj, std::string klass,
 
     printEventInfo(klass, major, minor, d1, d2, val, type);
 
+    static bool logDebuggingDisabled = true;
+    if(getenv("DISABLE_RDKAT")){
+        if(logDebuggingDisabled)
+            RDKLOG_ERROR("RDK-AT is disabled, not fetching accessibility info");
+        logDebuggingDisabled = false;
+        // skip costly dom traversals
+        return;
+    }
+
     RDKAt::Instance().ensureTTSConnection();
     RDKAt::Instance().createOrDestroySession();
 
     // If TTS is not enabled, skip costly dom traversals as part of name & desc retrieval
     static bool enableDebugging = getenv("ENABLE_RDKAT_DEBUGGING");
-    static bool logDebuggingDisabled = true;
     if(!RDKAt::Instance().m_ttsEnabled) {
         if(!enableDebugging) {
             if(logDebuggingDisabled)
