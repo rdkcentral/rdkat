@@ -28,7 +28,7 @@ SEARCH=\
   -I$(SYSROOT_INCLUDES_DIR)/glib-2.0 \
   -I$(SYSROOT_LIBS_DIR)/glib-2.0/include
 
-EXTRA_CXXFLAGS += -Wno-attributes -Wall -g -fpermissive $(SEARCH) -std=c++1y -fPIC
+EXTRA_CXXFLAGS += -Wno-attributes -Wall -g -fpermissive $(SEARCH) -std=c++17 -fPIC
 EXTRA_LDFLAGS = -lglib-2.0 -latk-1.0 -lTTSClient -Wl,-rpath=../../,-rpath=./
 
 ifdef ENABLE_RDK_LOGGER
