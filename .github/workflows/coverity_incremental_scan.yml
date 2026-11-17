@@ -1,0 +1,20 @@
+name: Coverity Incremental Analysis Scan
+
+on:
+  pull_request:
+    branches: [ develop topic/rdkemw-28419]
+
+  workflow_dispatch:
+    inputs:
+      pullRequestNumber:
+        description: 'Coverity Run: Pull Request Number'
+        required: true
+        type: string
+
+jobs:
+  call_coverity_incremental_scan:
+    uses: rdk-common/build_tools_workflows/.github/workflows/coverity_component_incremental_scan.yml@develop
+    with:
+      pullRequestNumber: ${{ github.event.inputs.pullRequestNumber || github.event.pull_request.number }}
+      branchName: ${{ github.event.pull_request.base.ref }}
+      buildCommand: make -f Makefile.atspi2 all && make -f Makefile.atk all

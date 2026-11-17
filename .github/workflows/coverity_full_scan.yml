@@ -1,0 +1,14 @@
+name: Coverity Full Analysis Scan
+
+on:
+  push:
+    branches: [ develop topic/rdkemw-28419]
+    paths: ['**/*.c', '**/*.cpp', '**/*.cc', '**/*.cxx', '**/*.h', '**/*.hpp']
+
+jobs:
+  call_coverity_full_scan:
+    uses: rdk-common/build_tools_workflows/.github/workflows/coverity_component_full_scan.yml@develop
+    with:
+      branchName: ${{ github.ref_name }}
+      buildCommand: make -f Makefile.atspi2 all && make -f Makefile.atk all
+
